@@ -43,7 +43,9 @@ async function main() {
     return
   }
 
-  const requestProcessorContract = await hre.ethers.deployContract('XRequestProcessor', [erc20TokenAddress])
+  const requestProcessorContract = await hre.ethers.deployContract('XRequestProcessor', [
+    erc20TokenAddress,
+  ])
   await requestProcessorContract.waitForDeployment()
 
   const requestProcessorAddress = await requestProcessorContract.getAddress()

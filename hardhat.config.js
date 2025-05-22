@@ -12,17 +12,17 @@ const hardhatConfig = {
       chainId: 31337,
     },
     ethereum: {
-      url: "https://eth.llamarpc.com",
+      url: 'https://eth.llamarpc.com',
       chainId: 1,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     base: {
-      url: "https://mainnet.base.org/",
+      url: 'https://mainnet.base.org/',
       chainId: 8453,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
     polygon: {
-      url: "https://polygon-rpc.com/",
+      url: 'https://polygon-rpc.com/',
       chainId: 137,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
@@ -46,9 +46,7 @@ const hardhatConfig = {
     apiKey: {
       mainnet: process.env.ETH_MAINNET_VERIFY_KEY ? process.env.ETH_MAINNET_VERIFY_KEY : undefined,
       base: process.env.BASE_MAINNET_VERIFY_KEY ? process.env.BASE_MAINNET_VERIFY_KEY : undefined,
-      polygon: process.env.POLYGON_API_VERIFY_KEY
-        ? process.env.POLYGON_API_VERIFY_KEY
-        : undefined,
+      polygon: process.env.POLYGON_API_VERIFY_KEY ? process.env.POLYGON_API_VERIFY_KEY : undefined,
     },
   },
   settings: {
@@ -58,6 +56,5 @@ const hardhatConfig = {
     },
   },
 }
-
 
 module.exports = hardhatConfig
