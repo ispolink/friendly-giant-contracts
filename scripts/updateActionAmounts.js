@@ -18,7 +18,7 @@ async function main() {
   const walletSigner = wallet.connect(provider)
 
   const requestProcessorAddress =
-    process.env.XREQUEST_PROCESSSOR_ADDRESS ||
+    process.env.XREQUEST_PROCESSOR_ADDRESS ||
     (await cliReader.question(`Enter XRequestProcessor address": `)).trim()
   if (!ethers.isAddress(requestProcessorAddress)) {
     console.log('Invalid XRequestProcessor address. Aborting.')

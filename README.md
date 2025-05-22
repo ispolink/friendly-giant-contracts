@@ -62,13 +62,13 @@ Populate your `.env` file or specify required env variables in the command direc
 To check the current price actions on a deployed contract instance:
 
 ```
-XREQUEST_PROCESSSOR_ADDRESS="0xPROCESSOR_ADDRESS" npx hardhat run --network base scripts/getActionAmounts.js
+XREQUEST_PROCESSOR_ADDRESS="0xPROCESSOR_ADDRESS" npx hardhat run --network base scripts/getActionAmounts.js
 ```
 
 To update the price actions on a deployed contract instance:
 
 ```
-PRIVATE_KEY="0xPRIVATE_KEY" XREQUEST_PROCESSSOR_ADDRESS="0xPROCESSOR_ADDRESS" npx hardhat run --network base scripts/updateActionAmounts.js
+PRIVATE_KEY="0xPRIVATE_KEY" XREQUEST_PROCESSOR_ADDRESS="0xPROCESSOR_ADDRESS" npx hardhat run --network base scripts/updateActionAmounts.js
 ```
 
 
