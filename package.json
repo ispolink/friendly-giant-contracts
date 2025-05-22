@@ -1,0 +1,26 @@
+{
+  "name": "friednly-giant-ai-contracts",
+  "version": "1.0.0",
+  "description": "This project contains all smart contracts used in Friendly Giant AI.",
+  "main": "main.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "prettify": "npm run prettier:js && npm run prettier:sol",
+    "prettier:js": "prettier --write 'scripts/**/*.js' 'test/**/*.js' 'hardhat.config.js'",
+    "prettier:sol": "prettier --write --plugin=prettier-plugin-solidity 'contracts/**/*.sol'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0",
+    "hardhat": "^2.24.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.5.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-solidity": "^2.0.0"
+  }
+}
