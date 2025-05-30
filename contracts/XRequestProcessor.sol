@@ -127,6 +127,13 @@ contract XRequestProcessor is Ownable {
   }
 
   /**
+   * @dev Retrieve the underlying payment token address
+   */
+  function getPaymentTokenAddress() public view returns (address) {
+    return address(_paymentToken);
+  }
+
+  /**
    * @dev Changes the underlying payment token address
    * @param newToken ERC20 token contract address
    */
