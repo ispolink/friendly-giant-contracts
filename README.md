@@ -1,5 +1,7 @@
 # Friendly Giant AI - Smart Contracts
 
+[![Friendly Giant AI tests](https://github.com/ispolink/friendly-giant-contracts/actions/workflows/main.yml/badge.svg)](https://github.com/ispolink/friendly-giant-contracts/actions)
+
 This project contains core Friendly Giant AI smart contracts and helper scripts for deployment and interaction.
 
 
