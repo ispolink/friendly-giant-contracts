@@ -4,7 +4,7 @@ const process = require('node:process')
 const hre = require('hardhat')
 const ethers = require('ethers')
 
-const { commify } = require('./modules/utils')
+const { humanReadableAmount } = require('./modules/utils')
 
 const cliReader = readline.createInterface({ input: process.stdin, output: process.stdout })
 
@@ -34,7 +34,7 @@ async function main() {
 
   console.log()
   console.log(
-    `Preparing deployment of ERC20: ${name}, Symbol: ${symbol}, Supply: ${commify(ethers.formatEther(supplyWei))}`
+    `Preparing deployment of ERC20: ${name}, Symbol: ${symbol}, Supply: ${humanReadableAmount(supplyWei)}`
   )
   console.log()
 
