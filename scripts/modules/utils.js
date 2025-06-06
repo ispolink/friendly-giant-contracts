@@ -16,6 +16,11 @@ function commify(value) {
   return `${neg}${whole}.${frac}`
 }
 
+/**
+ * Represent bigint numbers in human-readable form with thousands separator
+ * @param {bigint} bigNum
+ * @returns {string}
+ */
 function humanReadableAmount(bigNum) {
   return commify(ethers.formatEther(bigNum)).replace(/\.$/, '').replace(/\.0$/, '')
 }
