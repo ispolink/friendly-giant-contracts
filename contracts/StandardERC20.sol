@@ -6,12 +6,14 @@ import {ERC20} from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import {ERC20Burnable} from '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import {ERC20Permit} from '@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol';
 
-contract StandardERC20 is ERC20, ERC20Burnable, ERC20Permit {
+import {MisfundRecovery} from './MisfundRecovery.sol';
+
+contract StandardERC20 is ERC20, ERC20Burnable, ERC20Permit, MisfundRecovery {
   constructor(
     string memory name,
     string memory symbol,
     uint256 initialSupply
-  ) ERC20(name, symbol) ERC20Permit(name) {
+  ) ERC20(name, symbol) ERC20Permit(name) MisfundRecovery(msg.sender) {
     _mint(msg.sender, initialSupply);
   }
 }
