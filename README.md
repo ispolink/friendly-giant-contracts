@@ -49,7 +49,7 @@ PRIVATE_KEY="0xPRIVATE_KEY" ERC20_ADDRESS="0xERC20_ADDRESS" npx hardhat run --ne
 ### ERC20 contract
 
 ```
-PRIVATE_KEY="0xPRIVATE_KEY" npx hardhat run --network localhost scripts/deploy.js
+PRIVATE_KEY="0xPRIVATE_KEY" npx hardhat run --network localhost scripts/deployToken.js
 ```
 
 To deploy on another chain, specify the network key name (e.g. `baseSepolia`) from `hardhat.config.js`.
@@ -76,12 +76,12 @@ PRIVATE_KEY="0xPRIVATE_KEY" XREQUEST_PROCESSOR_ADDRESS="0xPROCESSOR_ADDRESS" npx
 
 ## Verify deployed contracts
 
-Populate `BASE_API_VERIFY_KEY` or other, depending on the deployed network
+Populate `ETHERSCAN_API_KEY` or other, depending on the deployed network
 
 To verify run:
 
 ```
-BASE_API_VERIFY_KEY="API_KEY" npx hardhat verify "DEPLOYED_CONTRACT_ADDR" --network base "Constructor arg 1" "Constructor arg 2"
+ETHERSCAN_API_KEY="API_KEY" npx hardhat verify "DEPLOYED_CONTRACT_ADDR" --network base "Constructor arg 1" "Constructor arg 2"
 ```
 
 To list all supported networks by hardhat and their chainIds:

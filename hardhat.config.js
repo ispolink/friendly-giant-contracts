@@ -43,11 +43,7 @@ const hardhatConfig = {
     },
   },
   etherscan: {
-    apiKey: {
-      mainnet: process.env.ETH_MAINNET_VERIFY_KEY ? process.env.ETH_MAINNET_VERIFY_KEY : undefined,
-      base: process.env.BASE_MAINNET_VERIFY_KEY ? process.env.BASE_MAINNET_VERIFY_KEY : undefined,
-      polygon: process.env.POLYGON_API_VERIFY_KEY ? process.env.POLYGON_API_VERIFY_KEY : undefined,
-    },
+    apiKey: process.env.ETHERSCAN_API_KEY ? process.env.ETHERSCAN_API_KEY : undefined,
   },
   settings: {
     optimizer: {
