@@ -183,6 +183,60 @@ describe(`XRequestProcessor tests`, function () {
     expect(processorContractBalance).to.equal(repostAmount)
   })
 
+  it('interactWithPost() - User should be able to invoke XActionType.TokenAnalysis actions', async function () {
+    const { owner, user1, processorContract, tokenContract } = await loadFixture(
+      deployXRequestProcessorFixture
+    )
+
+    await tokenContract.connect(owner).transfer(user1.address, tokenAnalysisAmount)
+    const processorContractAddress = await processorContract.getAddress()
+    await tokenContract.connect(user1).approve(processorContractAddress, tokenAnalysisAmount)
+
+    const userBalanceBefore = await tokenContract.balanceOf(user1.address)
+    expect(userBalanceBefore).to.equal(tokenAnalysisAmount)
+
+    const ticker = 'GIANTAI'
+    await expect(
+      processorContract.connect(user1).interactWithPost(XActionType.TokenAnalysis, ticker)
+    ).not.to.be.reverted
+  })
+
+  it('interactWithPost() - User should NOT be able to invoke XActionType.TokenAnalysis with invalid TICKER', async function () {
+    const { owner, user1, processorContract, tokenContract } = await loadFixture(
+      deployXRequestProcessorFixture
+    )
+
+    await tokenContract.connect(owner).transfer(user1.address, tokenAnalysisAmount)
+    const processorContractAddress = await processorContract.getAddress()
+    await tokenContract.connect(user1).approve(processorContractAddress, tokenAnalysisAmount)
+
+    const userBalanceBefore = await tokenContract.balanceOf(user1.address)
+    expect(userBalanceBefore).to.equal(tokenAnalysisAmount)
+
+    const ticker = 'SUPER_LONG_AND_INVALID_TICKER_NAME'
+    await expect(
+      processorContract.connect(user1).interactWithPost(XActionType.TokenAnalysis, ticker)
+    ).to.be.reverted
+  })
+
+  it('interactWithPost() - User should NOT be able to invoke actions with empty URI or TICKER', async function () {
+    const { owner, user1, processorContract, tokenContract } = await loadFixture(
+      deployXRequestProcessorFixture
+    )
+
+    await tokenContract.connect(owner).transfer(user1.address, tokenAnalysisAmount)
+    const processorContractAddress = await processorContract.getAddress()
+    await tokenContract.connect(user1).approve(processorContractAddress, tokenAnalysisAmount)
+
+    const userBalanceBefore = await tokenContract.balanceOf(user1.address)
+    expect(userBalanceBefore).to.equal(tokenAnalysisAmount)
+
+    const xPostUri = ''
+    await expect(
+      processorContract.connect(user1).interactWithPost(XActionType.TokenAnalysis, xPostUri)
+    ).to.be.reverted
+  })
+
   it('interactWithPost() - User should NOT be able to invoke actions without ERC20 balance', async function () {
     const { user1, processorContract, tokenContract } = await loadFixture(
       deployXRequestProcessorFixture
@@ -198,71 +252,6 @@ describe(`XRequestProcessor tests`, function () {
     await expect(
       processorContract.connect(user1).interactWithPost(XActionType.Like, xPostUri)
     ).to.be.revertedWithCustomError(tokenContract, 'ERC20InsufficientBalance')
-  })
-
-  it('interactWithPost() - User should NOT be able to invoke XActionType.TokenAnalysis through this method', async function () {
-    const { owner, user1, processorContract, tokenContract } = await loadFixture(
-      deployXRequestProcessorFixture
-    )
-
-    await tokenContract.connect(owner).transfer(user1.address, tokenAnalysisAmount)
-    const processorContractAddress = await processorContract.getAddress()
-    await tokenContract.connect(user1).approve(processorContractAddress, tokenAnalysisAmount)
-
-    const userBalanceBefore = await tokenContract.balanceOf(user1.address)
-    expect(userBalanceBefore).to.equal(tokenAnalysisAmount)
-
-    const xPostUri = 'https://x.com/SpaceX/status/1928107204931940365'
-    await expect(
-      processorContract.connect(user1).interactWithPost(XActionType.TokenAnalysis, xPostUri)
-    ).to.be.reverted
-  })
-
-  it('analyzeToken() - User should be able to invoke token analysis action', async function () {
-    const { owner, user1, processorContract, tokenContract } = await loadFixture(
-      deployXRequestProcessorFixture
-    )
-
-    await tokenContract.connect(owner).transfer(user1.address, tokenAnalysisAmount)
-    const processorContractAddress = await processorContract.getAddress()
-    await tokenContract.connect(user1).approve(processorContractAddress, tokenAnalysisAmount)
-
-    const userBalanceBefore = await tokenContract.balanceOf(user1.address)
-    expect(userBalanceBefore).to.equal(tokenAnalysisAmount)
-
-    await expect(processorContract.connect(user1).analyzeToken('GIANTAI')).to.emit(
-      processorContract,
-      'NewTokenAnalysis'
-    )
-
-    const userBalanceAfter = await tokenContract.balanceOf(user1.address)
-    expect(userBalanceAfter).to.equal(0n)
-
-    const processorContractBalance = await tokenContract.balanceOf(processorContractAddress)
-    expect(processorContractBalance).to.equal(tokenAnalysisAmount)
-  })
-
-  it('analyzeToken() - User should NOT be able to invoke token analysis without ERC20 balance', async function () {
-    const { user1, processorContract, tokenContract } = await loadFixture(
-      deployXRequestProcessorFixture
-    )
-
-    const spender = await processorContract.getAddress()
-    await tokenContract.connect(user1).approve(spender, tokenAnalysisAmount)
-
-    const userBalance = await tokenContract.balanceOf(user1.address)
-    expect(userBalance).to.equal(0n)
-
-    await expect(
-      processorContract.connect(user1).analyzeToken('GIANTAI')
-    ).to.be.revertedWithCustomError(tokenContract, 'ERC20InsufficientBalance')
-  })
-
-  it('analyzeToken() - Should throw when invalid token ticker is provided', async function () {
-    const { user1, processorContract } = await loadFixture(deployXRequestProcessorFixture)
-
-    const invalidTicker = 'INVALID_SUPER_LONG_TICKER_NAME'
-    await expect(processorContract.connect(user1).analyzeToken(invalidTicker)).to.be.reverted
   })
 
   it('getPaymentTokenAddress() - Should return the ERC20 address set during deploy time', async function () {

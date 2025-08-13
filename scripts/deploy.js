@@ -8,6 +8,10 @@ const { collectActionAmounts, submitActionAmounts } = require('./modules/blockch
 
 const cliReader = readline.createInterface({ input: process.stdin, output: process.stdout })
 
+async function sleep(seconds) {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000))
+}
+
 async function main() {
   const chainId = hre.network.config.chainId
   const rpcUrl = hre.network.config.url
@@ -53,6 +57,7 @@ async function main() {
   console.log()
 
   console.log('Publishing specified action prices...')
+  await sleep(5)
   const txData = await submitActionAmounts(actionsDto, requestProcessorAddress, walletSigner)
   console.log(`TX: ${txData.hash}`)
 }

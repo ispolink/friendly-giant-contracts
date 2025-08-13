@@ -24,9 +24,8 @@ contract XRequestProcessor is Ownable {
   event NewPostInteraction(
     address indexed payer,
     XActionType indexed actionType,
-    string indexed xPostUri
+    string uriOrTicker
   );
-  event NewTokenAnalysis(address indexed payer, string indexed tokenTicker);
   event PaymentTokenChanged(address newToken);
 
   /**
@@ -97,33 +96,23 @@ contract XRequestProcessor is Ownable {
   }
 
   /**
-   * @dev This function allows users to perform XActionType for the given postUri on X (Twitter)
+   * @dev This function allows users to perform XActionType for the given postUri on X (Twitter) or $TICKER
    * @param actionType A value from XActionType enum
-   * @param postUri A URI to a post in X (Twitter)
+   * @param uriOrTicker A URI to a post in X (Twitter) or a token $TICKER
    */
-  function interactWithPost(XActionType actionType, string memory postUri) public {
-    require(
-      actionType != XActionType.TokenAnalysis,
-      'TokenAnalysis action cannot be used with this function'
-    );
+  function interactWithPost(XActionType actionType, string memory uriOrTicker) public {
+    require(bytes(uriOrTicker).length > 0, 'URI or TICKER cannot be empty');
+
+    if (actionType == XActionType.TokenAnalysis) {
+      require(bytes(uriOrTicker).length <= 20, 'Invalid token ticker');
+    }
 
     uint256 paymentAmount = getActionPrice(actionType);
 
     // Safely transfer the required token amount from the user to this contract
     SafeERC20.safeTransferFrom(_paymentToken, msg.sender, address(this), paymentAmount);
 
-    emit NewPostInteraction(msg.sender, actionType, postUri);
-  }
-
-  function analyzeToken(string memory tokenTicker) public {
-    require(bytes(tokenTicker).length <= 20, 'Invalid token ticker');
-
-    uint256 paymentAmount = getActionPrice(XActionType.TokenAnalysis);
-
-    // Safely transfer the required token amount from the user to this contract
-    SafeERC20.safeTransferFrom(_paymentToken, msg.sender, address(this), paymentAmount);
-
-    emit NewTokenAnalysis(msg.sender, tokenTicker);
+    emit NewPostInteraction(msg.sender, actionType, uriOrTicker);
   }
 
   /**
