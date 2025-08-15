@@ -24,6 +24,7 @@ contract XRequestProcessor is Ownable {
   event NewPostInteraction(
     address indexed payer,
     XActionType indexed actionType,
+    uint128 indexed unixDay,
     string uriOrTicker
   );
   event PaymentTokenChanged(address newToken);
@@ -112,7 +113,10 @@ contract XRequestProcessor is Ownable {
     // Safely transfer the required token amount from the user to this contract
     SafeERC20.safeTransferFrom(_paymentToken, msg.sender, address(this), paymentAmount);
 
-    emit NewPostInteraction(msg.sender, actionType, uriOrTicker);
+    // Get the current day since the Unix epoch, by dividing by 24 hours (in seconds)
+    uint128 unixDay = uint128(block.timestamp / 86400);
+
+    emit NewPostInteraction(msg.sender, actionType, unixDay, uriOrTicker);
   }
 
   /**
