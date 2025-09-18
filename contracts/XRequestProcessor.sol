@@ -9,11 +9,15 @@ import {XActionType} from './XActionType.sol';
 
 contract XRequestProcessor is Ownable {
   IERC20 private _paymentToken;
+  uint8 private _burnPercentage;
 
   mapping(XActionType => uint256) private _actionAmounts;
 
+  address public constant DEAD_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+
   constructor(address paymentToken) Ownable(msg.sender) {
     _paymentToken = IERC20(paymentToken);
+    _burnPercentage = 50;
   }
 
   modifier nonZeroAddress(address account) {
@@ -108,10 +112,18 @@ contract XRequestProcessor is Ownable {
       require(bytes(uriOrTicker).length <= 20, 'Invalid token ticker');
     }
 
+    // Calculate the payment and burn amounts
     uint256 paymentAmount = getActionPrice(actionType);
+    uint256 burnAmount = (paymentAmount * _burnPercentage) / 100;
+    uint256 contractAmount = paymentAmount - burnAmount;
 
-    // Safely transfer the required token amount from the user to this contract
-    SafeERC20.safeTransferFrom(_paymentToken, msg.sender, address(this), paymentAmount);
+    // Safely transfer the payment and burn amounts
+    if (contractAmount > 0) {
+      SafeERC20.safeTransferFrom(_paymentToken, msg.sender, address(this), contractAmount);
+    }
+    if (burnAmount > 0) {
+      SafeERC20.safeTransferFrom(_paymentToken, msg.sender, DEAD_ADDRESS, burnAmount);
+    }
 
     // Get the current day since the Unix epoch, by dividing by 24 hours (in seconds)
     uint128 unixDay = uint128(block.timestamp / 86400);
@@ -133,6 +145,22 @@ contract XRequestProcessor is Ownable {
   function setPaymentTokenAddress(address newToken) public onlyOwner nonZeroAddress(newToken) {
     _paymentToken = IERC20(newToken);
     emit PaymentTokenChanged(newToken);
+  }
+
+  /**
+   * @dev Returns the current burn percentage
+   */
+  function getBurnPercentage() public view returns (uint8) {
+    return _burnPercentage;
+  }
+
+  /**
+   * @dev Sets the burn percentage
+   * @param newPercentage The new burn percentage (e.g., 25 for 25%)
+   */
+  function setBurnPercentage(uint8 newPercentage) public onlyOwner {
+    require(newPercentage <= 100, 'Burn percentage cannot exceed 100');
+    _burnPercentage = newPercentage;
   }
 
   /**

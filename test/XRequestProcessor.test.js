@@ -22,6 +22,17 @@ const XActionType = {
   TokenAnalysis: 5,
 }
 
+/**
+ * @param {bigint} totalAmount
+ * @param {bigint} burnPercentage
+ * @returns {[bigint, bigint]}
+ */
+const applyBurnPercentage = (totalAmount, burnPercentage) => {
+  const burnAmount = (totalAmount * burnPercentage) / 100n
+  const remainingAmount = totalAmount - burnAmount
+  return [remainingAmount, burnAmount]
+}
+
 describe(`XRequestProcessor tests`, function () {
   async function deployXRequestProcessorFixture() {
     const [owner, user1] = await ethers.getSigners()
@@ -179,8 +190,14 @@ describe(`XRequestProcessor tests`, function () {
     const userBalanceAfter = await tokenContract.balanceOf(user1.address)
     expect(userBalanceAfter).to.equal(0n)
 
+    const burnPercent = await processorContract.getBurnPercentage()
+    const [paymentAmount, burnAmount] = applyBurnPercentage(repostAmount, burnPercent)
+
     const processorContractBalance = await tokenContract.balanceOf(processorContractAddress)
-    expect(processorContractBalance).to.equal(repostAmount)
+    expect(processorContractBalance).to.equal(paymentAmount)
+
+    const deadAddressBalance = await tokenContract.balanceOf(await processorContract.DEAD_ADDRESS())
+    expect(deadAddressBalance).to.equal(burnAmount)
   })
 
   it('interactWithPost() - User should be able to invoke XActionType.TokenAnalysis actions', async function () {
@@ -305,6 +322,28 @@ describe(`XRequestProcessor tests`, function () {
       .reverted
   })
 
+  it('setBurnPercentage() - Regular user should NOT be able to change the burn percentage', async function () {
+    const { user1, processorContract } = await loadFixture(deployXRequestProcessorFixture)
+
+    const newBurnPercent = 0n
+    await expect(processorContract.connect(user1).setBurnPercentage(newBurnPercent)).to.be.reverted
+  })
+
+  it('setBurnPercentage() - Owner should be able to change the burn percentage between 0-100', async function () {
+    const { owner, processorContract } = await loadFixture(deployXRequestProcessorFixture)
+
+    const validPercentages = [0n, 15n, 25n, 50n, 80n, 100n]
+    for (let percent of validPercentages) {
+      await expect(processorContract.connect(owner).setBurnPercentage(percent)).not.to.be.reverted
+      expect(await processorContract.getBurnPercentage(), percent)
+    }
+
+    const invalidPercentages = [101n, 150n, 200n]
+    for (let percent of invalidPercentages) {
+      await expect(processorContract.connect(owner).setBurnPercentage(percent)).to.be.reverted
+    }
+  })
+
   it('withdrawFunds() - Owner should be able to withdraw funds to a new address', async function () {
     const { owner, processorContract, tokenContract } = await loadFixture(
       deployXRequestProcessorFixture
@@ -315,13 +354,14 @@ describe(`XRequestProcessor tests`, function () {
     await tokenContract.connect(owner).approve(processorContractAddress, replyToThreadAmount)
     const xPostUri = 'https://x.com/SpaceX/status/1928107204931940365'
     await processorContract.connect(owner).interactWithPost(XActionType.ReplyToThread, xPostUri)
+    const processorContractBalance = await tokenContract.balanceOf(processorContractAddress)
 
     const otherWallet = ethers.Wallet.createRandom()
     await expect(processorContract.connect(owner).withdrawFunds(otherWallet.address)).not.to.be
       .reverted
 
     const otherWalletBalance = await tokenContract.balanceOf(otherWallet.address)
-    expect(otherWalletBalance).to.equal(replyToThreadAmount)
+    expect(otherWalletBalance).to.equal(processorContractBalance)
   })
 
   it('withdrawFunds() - Regular user should NOT be able to withdraw funds', async function () {
